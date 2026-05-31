@@ -346,7 +346,7 @@
     }
 
     function xuLyDangNhapThanhCong(response) { localStorage.setItem('ht_jwt_token', response.credential); kiemTraTrangThaiDangNhap(); }
-    function dangXuat() { if(confirm("Thầy/Cô có chắc chắn muốn đăng xuất tài khoản an toàn khỏi hệ thống?")) { localStorage.removeItem('ht_jwt_token'); pickerAccessToken = null; location.reload(); } }
+    function dangXuat() { localStorage.removeItem('ht_jwt_token'); pickerAccessToken = null; location.reload(); }
 
     function loadDesktopData(jwtToken) {
         fetch(KETNOI.WEB_APP_URL, {
