@@ -134,6 +134,7 @@
                 <span class="material-icons">manage_accounts</span> Cấp quyền
             </button>
 
+            <div class="tray-icon" onclick="toggleFullScreen()" title="Bật/Tắt Toàn màn hình"><span class="material-icons" id="fullscreen-icon">fullscreen</span></div>
             <div class="tray-icon" onclick="resetPositions()" title="Khôi phục vị trí gốc của các biểu tượng"><span class="material-icons">restore</span></div>
             <div class="tray-icon" onclick="toggleUtilities(true)" title="Mở Tiện ích dạy học"><span class="material-icons">build_circle</span></div>
             <div class="tray-icon" onclick="changeBackgroundImage()" title="Cấu hình Hình nền Desktop"><span class="material-icons">wallpaper</span></div>
@@ -647,6 +648,41 @@
     function resetPositions() { localStorage.removeItem('ht_desktop_positions_v3'); icons.forEach(icon => { icon.style.position = ''; icon.style.left = ''; icon.style.top = ''; icon.style.margin = ''; }); initializeLayout(); }
     function changeBackgroundImage() { var currentUrl = localStorage.getItem("ht_dashboard_bg") || ""; var newUrl = prompt("CẤU HÌNH HÌNH NỀN DESKTOP\n\nNhập đường dẫn (URL) hình ảnh:\n(Để trống nếu muốn quay về hình nền mặc định)", currentUrl); if (newUrl !== null) { if (newUrl.trim() === "") { localStorage.removeItem("ht_dashboard_bg"); document.documentElement.style.setProperty('--default-bg', "url('https://i.ibb.co/4gCSYHV6/congthongtin1.jpg')"); } else { localStorage.setItem("ht_dashboard_bg", newUrl.trim()); document.documentElement.style.setProperty('--default-bg', "url('" + newUrl.trim() + "')"); } } }
     function toggleUtilities(isShow) { document.getElementById('window-utilities').style.display = isShow ? 'flex' : 'none'; }
+
+    /* =========================================================================
+       4. KHỐI ĐIỀU KHIỂN TOÀN MÀN HÌNH (FULLSCREEN)
+       ========================================================================= */
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.log(`Không thể bật toàn màn hình: ${err.message}`);
+            });
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+    document.addEventListener('fullscreenchange', (event) => {
+        const icon = document.getElementById('fullscreen-icon');
+        if (icon) {
+            if (document.fullscreenElement) {
+                icon.innerText = 'fullscreen_exit';
+            } else {
+                icon.innerText = 'fullscreen';
+            }
+        }
+    });
+
+    desktopArea.addEventListener('click', function autoFullscreen(e) {
+        if (e.target === desktopArea) {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {});
+            }
+            desktopArea.removeEventListener('click', autoFullscreen);
+        }
+    });
 </script>
 </body>
 </html>
