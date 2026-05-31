@@ -154,7 +154,6 @@
         </div>
     </div>
 
-    <!-- UI GÁN HỒ SƠ -->
     <div id="window-gan-hoso" class="window-overlay">
         <div class="window-container">
             <div class="window-titlebar">
@@ -199,7 +198,6 @@
         </div>
     </div>
 
-    <!-- UI XÓA HỒ SƠ -->
     <div id="window-xoa-hoso" class="window-overlay">
         <div class="window-container">
             <div class="window-titlebar">
@@ -219,7 +217,6 @@
         </div>
     </div>
 
-    <!-- UI PHÂN QUYỀN NATIVE -->
     <div id="window-phanquyen" class="window-overlay">
         <div class="window-container">
             <div class="window-titlebar">
@@ -410,7 +407,10 @@
             body: JSON.stringify({ action: 'saveProfile', hoTen: hoTen, link: link, loaiIcon: loaiIcon, credential: localStorage.getItem('ht_jwt_token') })
         }).then(response => response.json()).then(result => {
             document.getElementById('form-status').style.display = 'none';
-            if (result.status === 'success') { alert("Gán hồ sơ/dự án thành công!"); toggleHoSoModal(false); loadDesktopData(localStorage.getItem('ht_jwt_token')); } else { alert("Lỗi hệ thống: " + result.message); }
+            if (result.status === 'success') {
+                toggleHoSoModal(false);
+                loadDesktopData(localStorage.getItem('ht_jwt_token'));
+            } else { alert("Lỗi hệ thống: " + result.message); }
         });
     }
 
