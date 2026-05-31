@@ -36,18 +36,18 @@
         .icon-box { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); pointer-events: none; }
         .icon-box .material-icons { font-size: 34px; color: #ffffff; }
 
-        /* BẢNG MÀU CHUẨN MỚI THEO LOẠI DỰ ÁN */
-        .bg-1 { background: #1976D2; border: 2px solid #90CAF9; } /* Xanh lam */
-        .bg-2 { background: #F57C00; border: 2px solid #FFCC80; } /* Vàng cam */
-        .bg-3 { background: #388E3C; border: 2px solid #A5D6A7; } /* Xanh lục */
-        .bg-4 { background: #00796B; border: 2px solid #80CBC4; } /* Xanh cổ vịt */
-        .bg-5 { background: #7B1FA2; border: 2px solid #CE93D8; } /* Tím */
-        .bg-6 { background: #795548; border: 2px solid #BCAAA4; } /* Nâu */
-        .bg-7 { background: #D32F2F; border: 2px solid #EF9A9A; } /* Đỏ */
-        .bg-8 { background: #E65100; border: 2px solid #FFCC80; } /* Cam đậm */
-        .bg-9 { background: #546E7A; border: 2px solid #B0BEC5; } /* Xám xanh */
-        .bg-10 { background: #0097A7; border: 2px solid #80DEEA; } /* Xanh lơ */
-        .bg-default { background: #546E7A; border: 2px solid #B0BEC5; }
+        /* BẢNG MÀU CHUẨN ĐẠI DIỆN CHO CÁC LĨNH VỰC */
+        .bg-1 { background: #1976D2; border: 2px solid #90CAF9; } /* Xanh lam (Thời gian/Lịch) */
+        .bg-2 { background: #F57C00; border: 2px solid #FFCC80; } /* Vàng cam (Văn bản/Hồ sơ) */
+        .bg-3 { background: #388E3C; border: 2px solid #A5D6A7; } /* Xanh lục (Đánh giá/Giao việc) */
+        .bg-4 { background: #00796B; border: 2px solid #80CBC4; } /* Xanh cổ vịt (Học sinh) */
+        .bg-5 { background: #7B1FA2; border: 2px solid #CE93D8; } /* Tím (Nhân sự) */
+        .bg-6 { background: #795548; border: 2px solid #BCAAA4; } /* Nâu (Cơ sở vật chất) */
+        .bg-7 { background: #D32F2F; border: 2px solid #EF9A9A; } /* Đỏ (Đặc biệt) */
+        .bg-8 { background: #E65100; border: 2px solid #FFCC80; } /* Cam đậm (Tài chính) */
+        .bg-9 { background: #546E7A; border: 2px solid #B0BEC5; } /* Xám xanh (Cài đặt) */
+        .bg-10 { background: #0097A7; border: 2px solid #80DEEA; } /* Xanh lơ (Báo cáo) */
+        .bg-default { background: #546E7A; border: 2px solid #B0BEC5; } /* Mặc định */
 
         .icon-text { color: #ffffff; font-size: 12px; font-weight: 600; text-align: center; line-height: 1.3; text-shadow: 1px 1px 2px #000000, 0 0 10px rgba(0,0,0,0.8); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-wrap: break-word; pointer-events: none; }
         
@@ -154,6 +154,7 @@
         </div>
     </div>
 
+    <!-- UI GÁN HỒ SƠ -->
     <div id="window-gan-hoso" class="window-overlay">
         <div class="window-container">
             <div class="window-titlebar">
@@ -177,19 +178,19 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Loại Dự án / Phân hệ (Cột C): <span style="color: red;">*</span></label>
+                    <label>Lĩnh vực Dự án (Cột C): <span style="color: red;">*</span></label>
                     <select id="hs-loaiicon">
-                        <option value="">-- Chọn loại dự án --</option>
-                        <option value="1">1. Sổ công văn & Lịch CT</option>
-                        <option value="2">2. Sổ kiểm tra nội bộ</option>
-                        <option value="3">3. Đánh giá công tác</option>
-                        <option value="4">4. Quản lý học sinh</option>
-                        <option value="5">5. Chất lượng đội ngũ</option>
-                        <option value="6">6. Chế độ đội ngũ</option>
-                        <option value="7">7. Quản lý tài trợ</option>
-                        <option value="8">8. Quản lý quỹ nội bộ</option>
-                        <option value="9">9. Đánh giá viên chức</option>
-                        <option value="10">10. Tính chế độ BHXH, Hưu</option>
+                        <option value="">-- Chọn lĩnh vực dự án --</option>
+                        <option value="caidat">Cài đặt & Hệ thống (Bánh răng)</option>
+                        <option value="nhansu">Nhân sự & Đội ngũ (Nhiều người)</option>
+                        <option value="hocsinh">Học sinh & Đào tạo (Học sinh)</option>
+                        <option value="thoigian">Thời gian & Lịch trình (Lịch)</option>
+                        <option value="taichinh">Tài chính & Quỹ (Ví tiền)</option>
+                        <option value="vanban">Văn bản & Hồ sơ (Tài liệu)</option>
+                        <option value="danhgia">Đánh giá & Công việc (Bảng ghi)</option>
+                        <option value="csvc">Cơ sở vật chất (Kho chứa)</option>
+                        <option value="baocao">Báo cáo & Thống kê (Biểu đồ)</option>
+                        <option value="khac">Dự án Khác (Biểu tượng chung)</option>
                     </select>
                 </div>
                 <button class="form-native btn-submit" onclick="xuLyLuuHoSo()">Lưu Dữ Liệu Hệ Thống</button>
@@ -198,6 +199,7 @@
         </div>
     </div>
 
+    <!-- UI XÓA HỒ SƠ -->
     <div id="window-xoa-hoso" class="window-overlay">
         <div class="window-container">
             <div class="window-titlebar">
@@ -217,6 +219,7 @@
         </div>
     </div>
 
+    <!-- UI PHÂN QUYỀN NATIVE -->
     <div id="window-phanquyen" class="window-overlay">
         <div class="window-container">
             <div class="window-titlebar">
@@ -491,30 +494,30 @@
     }
 
     /* =========================================================================
-       3. KHỐI TẠO HÌNH NỀN ICON TRỰC QUAN THEO LOẠI DỰ ÁN
+       3. KHỐI TẠO HÌNH NỀN ICON TRỰC QUAN THEO LĨNH VỰC DỰ ÁN
        ========================================================================= */
     function renderIconsFromData(data) {
         globalProfiles = data; 
         desktopArea.innerHTML = ''; 
         
         data.forEach((item, index) => {
-            let type = item.iconType; // Nhận mã loại dự án từ Cột C
+            let type = item.iconType; // Nhận mã lĩnh vực dự án từ Cột C
             
-            // THUẬT TOÁN ĐIỀU CHỈNH GIAO DIỆN ICON THEO BẢNG CHUẨN
-            let iconContent = '<span class="material-icons">folder</span>'; 
+            // THUẬT TOÁN ĐIỀU CHỈNH GIAO DIỆN ICON THEO LĨNH VỰC KHÁI QUÁT
+            let iconContent = '<span class="material-icons">apps</span>'; 
             let bgClass = 'bg-default'; 
 
             switch(type) {
-                case '1': iconContent = '<span class="material-icons">calendar_month</span>'; bgClass = 'bg-1'; break;
-                case '2': iconContent = '<span class="material-icons">fact_check</span>'; bgClass = 'bg-2'; break;
-                case '3': iconContent = '<span class="material-icons">assignment</span>'; bgClass = 'bg-3'; break;
-                case '4': iconContent = '<span class="material-icons">school</span>'; bgClass = 'bg-4'; break;
-                case '5': iconContent = '<span class="material-icons">groups</span>'; bgClass = 'bg-5'; break;
-                case '6': iconContent = '<span class="material-icons">badge</span>'; bgClass = 'bg-6'; break;
-                case '7': iconContent = '<span class="material-icons">volunteer_activism</span>'; bgClass = 'bg-7'; break;
-                case '8': iconContent = '<span class="material-icons">account_balance_wallet</span>'; bgClass = 'bg-8'; break;
-                case '9': iconContent = '<span class="material-icons">assignment_ind</span>'; bgClass = 'bg-9'; break;
-                case '10': iconContent = '<span class="material-icons">calculate</span>'; bgClass = 'bg-10'; break;
+                case 'caidat': iconContent = '<span class="material-icons">settings</span>'; bgClass = 'bg-9'; break;
+                case 'nhansu': iconContent = '<span class="material-icons">groups</span>'; bgClass = 'bg-5'; break;
+                case 'hocsinh': iconContent = '<span class="material-icons">school</span>'; bgClass = 'bg-4'; break;
+                case 'thoigian': iconContent = '<span class="material-icons">calendar_month</span>'; bgClass = 'bg-1'; break;
+                case 'taichinh': iconContent = '<span class="material-icons">account_balance_wallet</span>'; bgClass = 'bg-8'; break;
+                case 'vanban': iconContent = '<span class="material-icons">description</span>'; bgClass = 'bg-2'; break;
+                case 'danhgia': iconContent = '<span class="material-icons">assignment</span>'; bgClass = 'bg-3'; break;
+                case 'csvc': iconContent = '<span class="material-icons">inventory</span>'; bgClass = 'bg-6'; break;
+                case 'baocao': iconContent = '<span class="material-icons">bar_chart</span>'; bgClass = 'bg-10'; break;
+                case 'khac': iconContent = '<span class="material-icons">apps</span>'; bgClass = 'bg-default'; break;
                 default: iconContent = '<span class="material-icons">folder</span>'; bgClass = 'bg-default'; break;
             }
 
