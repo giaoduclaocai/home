@@ -24,7 +24,7 @@
         })();
     </script>
     <style>
-        :root { --default-bg: url('https://i.ibb.co/hJy3vH7y/hinh-nen-win-11-50-1.jpg'); }
+        :root { --default-bg: url('https://i.ibb.co/h1CBtJNW/Hinh-Nen-Ruong-Bac-Thang-15.jpg'); }
         * { box-sizing: border-box; user-select: none; }
         html, body { height: 100vh; width: 100vw; margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #2c3e50; background-image: var(--default-bg); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat; display: flex; flex-direction: column; }
@@ -97,7 +97,7 @@
         /* Giao diện Phân quyền Native */
         .phanquyen-layout { display: flex; gap: 20px; padding: 20px; height: calc(100% - 46px); background: #f4f6f8; box-sizing: border-box; user-select: text; }
         .pq-panel { background: #ffffff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 20px; display: flex; flex-direction: column; }
-        .pq-form { width: 350px; flex-shrink: 0; }
+        .pq-form { width: 350px; flex-shrink: 0; overflow-y: auto;}
         .pq-table-container { flex: 1; overflow-y: auto; }
         .pq-panel h3 { margin-top: 0; color: #333; font-size: 16px; border-bottom: 2px solid #8E24AA; padding-bottom: 8px; margin-bottom: 15px; }
         .checkbox-group { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; background: #f9f9f9; padding: 10px; border-radius: 4px; border: 1px solid #eee; }
@@ -108,6 +108,15 @@
         .pq-table tr:hover { background: #f3e5f5; }
         .action-link { color: #1976D2; cursor: pointer; font-weight: 600; margin-right: 10px; text-decoration: underline; }
         .action-link.delete { color: #d32f2f; }
+
+        /* Khối UI Cảnh báo Bảo mật */
+        #window-alert .window-container { width: 420px; height: auto; }
+        #window-alert .window-titlebar { background-color: #ffebee; border-bottom: 1px solid #ffcdd2; }
+        #window-alert .window-title { color: #c62828; }
+        #window-alert .alert-content { padding: 30px 20px; text-align: center; }
+        #window-alert .alert-icon { font-size: 54px; color: #d32f2f; margin-bottom: 15px; }
+        #window-alert .alert-heading { margin: 0 0 10px 0; color: #333; font-size: 18px; }
+        #window-alert .alert-message { font-size: 14px; color: #555; line-height: 1.5; margin-bottom: 25px; }
     </style>
 </head>
 <body>
@@ -300,6 +309,11 @@
                             </label>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label>Cấp quyền mở Hồ sơ/Icon (Đánh dấu x):</label>
+                        <div class="checkbox-group" id="icon-permission-list" style="max-height: 200px; overflow-y: auto;">
+                            </div>
+                    </div>
                     <button class="form-native btn-submit" style="background-color: #8E24AA;" onclick="saveUser()">Lưu Cập Nhật</button>
                     <button class="form-native btn-submit" style="background-color: #757575;" onclick="clearUserForm()">Làm Mới Form</button>
                     <div id="pq-status" class="status-text" style="color:#8E24AA;">Đang xử lý...</div>
@@ -320,10 +334,28 @@
         </div>
     </div>
 
+    <div id="window-alert" class="window-overlay">
+        <div class="window-container">
+            <div class="window-titlebar">
+                <div class="window-title"><span class="material-icons">warning</span> Cảnh báo Bảo mật</div>
+                <button class="window-close" onclick="closeAlertModal()">✕</button>
+            </div>
+            <div class="alert-content">
+                <span class="material-icons alert-icon">gpp_bad</span>
+                <h3 class="alert-heading">Hệ thống từ chối truy cập</h3>
+                <div id="alert-message" class="alert-message"></div>
+                <button class="form-native btn-submit" style="background-color: #d32f2f; width: 120px; margin: 0 auto;" onclick="closeAlertModal()">Đã hiểu</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     let icons = []; let isDragging = false; const tooltip = document.getElementById('win-tooltip'); const desktopArea = document.getElementById('desktop-area');
     let tokenClient; let pickerAccessToken = null;
-    let globalProfiles = []; // Lưu trữ tạm danh sách hồ sơ để dùng cho Cửa sổ Xóa
+    let globalProfiles = []; 
+    // Khai báo 2 biến toàn cục để lưu trữ quyền nhận về từ Máy chủ
+    let sysRoles = "";       
+    let sysIconRoles = "";   
 
     /* =========================================================================
        0. KHỐI XÁC THỰC GOOGLE VÀ NẠP DỮ LIỆU CHÍNH DANH
@@ -359,7 +391,10 @@
         }).then(response => response.json()).then(result => {
             if (result.status === 'success') { 
                 document.getElementById('sys-name').innerText = result.verifiedEmail; 
-                renderIconsFromData(result.data); apDungPhanQuyen(result.roles || ""); 
+                // Nạp quyền vào biến toàn cục ngay khi hệ thống tải xong
+                sysRoles = result.roles || "";
+                sysIconRoles = result.iconRoles || "";
+                renderIconsFromData(result.data); apDungPhanQuyen(sysRoles); 
             } else { alert(result.message); dangXuat(); }
         }).catch(error => console.error("Lỗi:", error));
     }
@@ -477,7 +512,14 @@
        ========================================================================= */
     function togglePhanQuyenModal(isShow) {
         document.getElementById('window-phanquyen').style.display = isShow ? 'flex' : 'none';
-        if (isShow) { loadUsers(); } else { clearUserForm(); }
+        if (isShow) { 
+            const iconListContainer = document.getElementById('icon-permission-list');
+            iconListContainer.innerHTML = '';
+            globalProfiles.forEach(profile => {
+                iconListContainer.innerHTML += `<label class="checkbox-label"><input type="checkbox" class="icon-role-cb" value="${profile.name}"> ${profile.name}</label>`;
+            });
+            loadUsers(); 
+        } else { clearUserForm(); }
     }
 
     function loadUsers() {
@@ -500,24 +542,35 @@
             if (user.roles.includes('ganhoso')) displayRoles.push('Gán hồ sơ');
             if (user.roles.includes('xoahoso')) displayRoles.push('Xóa hồ sơ');
             if (user.roles.includes('xx')) displayRoles.push('<b style="color:#d32f2f">Quản trị viên</b>');
+            
+            const safeName = user.name.replace(/'/g, "\\'");
+            const safeRoles = user.roles.replace(/'/g, "\\'");
+            const safeIconRoles = (user.iconRoles || "").replace(/'/g, "\\'");
+
             tr.innerHTML = `<td>${user.name}</td><td>${user.email}</td><td>${displayRoles.join(' | ')}</td>
-                <td><span class="action-link" onclick="editUser('${user.name}', '${user.email}', '${user.roles}')">Sửa</span>
+                <td><span class="action-link" onclick="editUser('${safeName}', '${user.email}', '${safeRoles}', '${safeIconRoles}')">Sửa</span>
                     <span class="action-link delete" onclick="deleteUser('${user.email}')">Xóa</span></td>`;
             tbody.appendChild(tr);
         });
     }
 
-    function editUser(name, email, roles) {
+    function editUser(name, email, roles, iconRoles) {
         document.getElementById('pq-name').value = name; document.getElementById('pq-email').value = email;
         document.getElementById('role-taohoso').checked = roles.includes('taohoso');
         document.getElementById('role-ganhoso').checked = roles.includes('ganhoso');
         document.getElementById('role-xoahoso').checked = roles.includes('xoahoso');
         document.getElementById('role-xx').checked = roles.includes('xx');
+
+        const allowedIcons = (iconRoles || "").split('|');
+        document.querySelectorAll('.icon-role-cb').forEach(cb => {
+            cb.checked = allowedIcons.includes(cb.value);
+        });
     }
 
     function clearUserForm() {
         document.getElementById('pq-name').value = ''; document.getElementById('pq-email').value = '';
         document.getElementById('role-taohoso').checked = false; document.getElementById('role-ganhoso').checked = false; document.getElementById('role-xoahoso').checked = false; document.getElementById('role-xx').checked = false;
+        document.querySelectorAll('.icon-role-cb').forEach(cb => cb.checked = false);
     }
 
     function saveUser() {
@@ -528,10 +581,15 @@
         if (document.getElementById('role-ganhoso').checked) roles.push('ganhoso');
         if (document.getElementById('role-xoahoso').checked) roles.push('xoahoso');
         if (document.getElementById('role-xx').checked) roles.push('xx');
+
+        let selectedIcons = [];
+        document.querySelectorAll('.icon-role-cb:checked').forEach(cb => selectedIcons.push(cb.value));
+        let iconRolesStr = selectedIcons.join('|');
+
         document.getElementById('pq-status').style.display = 'block';
         fetch(KETNOI.WEB_APP_URL, {
             method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'saveUser', name: name, email: email, roles: roles.join(','), credential: localStorage.getItem('ht_jwt_token') })
+            body: JSON.stringify({ action: 'saveUser', name: name, email: email, roles: roles.join(','), iconRoles: iconRolesStr, credential: localStorage.getItem('ht_jwt_token') })
         }).then(response => response.json()).then(result => {
             document.getElementById('pq-status').style.display = 'none';
             if (result.status === 'success') { alert("Cập nhật quyền thành công!"); clearUserForm(); loadUsers(); loadDesktopData(localStorage.getItem('ht_jwt_token')); } else { alert("Lỗi: " + result.message); }
@@ -552,8 +610,17 @@
     }
 
     /* =========================================================================
-       3. KHỐI TẠO HÌNH NỀN ICON TRỰC QUAN THEO LĨNH VỰC DỰ ÁN
+       3. KHỐI TẠO HÌNH NỀN ICON VÀ KIỂM DUYỆT BẢO MẬT BẰNG UI MỚI
        ========================================================================= */
+    function showAlertModal(message) {
+        document.getElementById('alert-message').innerHTML = message;
+        document.getElementById('window-alert').style.display = 'flex';
+    }
+
+    function closeAlertModal() {
+        document.getElementById('window-alert').style.display = 'none';
+    }
+
     function renderIconsFromData(data) {
         globalProfiles = data; 
         desktopArea.innerHTML = ''; 
@@ -564,7 +631,6 @@
             let bgClass = 'bg-default'; 
 
             switch(type) {
-                // Giáo dục & Hành chính
                 case 'hocsinh': iconContent = '<span class="material-icons">school</span>'; bgClass = 'bg-4'; break;
                 case 'nhansu': iconContent = '<span class="material-icons">groups</span>'; bgClass = 'bg-5'; break;
                 case 'vanban': iconContent = '<span class="material-icons">description</span>'; bgClass = 'bg-2'; break;
@@ -580,14 +646,12 @@
                 case 'csvc': iconContent = '<span class="material-icons">inventory</span>'; bgClass = 'bg-6'; break;
                 case 'thuvien': iconContent = '<span class="material-icons">local_library</span>'; bgClass = 'bg-4'; break;
                 case 'doandoi': iconContent = '<span class="material-icons">flag</span>'; bgClass = 'bg-1'; break;
-                // Công nghệ & Kỹ thuật
                 case 'caidat': iconContent = '<span class="material-icons">settings</span>'; bgClass = 'bg-9'; break;
                 case 'congnghe': iconContent = '<span class="material-icons">memory</span>'; bgClass = 'bg-9'; break;
                 case 'mang': iconContent = '<span class="material-icons">wifi</span>'; bgClass = 'bg-1'; break;
                 case 'dienthoai': iconContent = '<span class="material-icons">smartphone</span>'; bgClass = 'bg-7'; break;
                 case 'trituemay': iconContent = '<span class="material-icons">smart_toy</span>'; bgClass = 'bg-9'; break;
                 case 'phantich': iconContent = '<span class="material-icons">query_stats</span>'; bgClass = 'bg-10'; break;
-                // Đời sống & Xã hội
                 case 'yte': iconContent = '<span class="material-icons">health_and_safety</span>'; bgClass = 'bg-7'; break;
                 case 'thethao': iconContent = '<span class="material-icons">sports_soccer</span>'; bgClass = 'bg-2'; break;
                 case 'vanhoa': iconContent = '<span class="material-icons">theater_comedy</span>'; bgClass = 'bg-5'; break;
@@ -597,7 +661,6 @@
                 case 'baove': iconContent = '<span class="material-icons">security</span>'; bgClass = 'bg-9'; break;
                 case 'vesinh': iconContent = '<span class="material-icons">cleaning_services</span>'; bgClass = 'bg-3'; break;
                 case 'xeco': iconContent = '<span class="material-icons">directions_car</span>'; bgClass = 'bg-6'; break;
-                // Kinh tế & Ngoại giao
                 case 'doingoai': iconContent = '<span class="material-icons">public</span>'; bgClass = 'bg-1'; break;
                 case 'du_an': iconContent = '<span class="material-icons">rocket_launch</span>'; bgClass = 'bg-8'; break;
                 case 'khoa_hoc': iconContent = '<span class="material-icons">science</span>'; bgClass = 'bg-10'; break;
@@ -612,10 +675,8 @@
                 case 'baohiem': iconContent = '<span class="material-icons">shield</span>'; bgClass = 'bg-10'; break;
                 case 'thue': iconContent = '<span class="material-icons">request_quote</span>'; bgClass = 'bg-8'; break;
                 case 'nangluong': iconContent = '<span class="material-icons">bolt</span>'; bgClass = 'bg-2'; break;
-                // Giới tính & Cá nhân
                 case 'nam': iconContent = '<span class="material-icons">male</span>'; bgClass = 'bg-1'; break;
                 case 'nu': iconContent = '<span class="material-icons">female</span>'; bgClass = 'bg-5'; break;
-                // Khác
                 case 'danso': iconContent = '<span class="material-icons">family_restroom</span>'; bgClass = 'bg-5'; break;
                 case 'tainguyen': iconContent = '<span class="material-icons">forest</span>'; bgClass = 'bg-3'; break;
                 case 'phucvu': iconContent = '<span class="material-icons">room_service</span>'; bgClass = 'bg-7'; break;
@@ -628,14 +689,29 @@
             const div = document.createElement('div'); 
             div.className = 'desktop-icon'; 
             div.setAttribute('data-id', index + 1); 
-
-            // =========================================================================
-            // CẬP NHẬT: Thay thế văn bản hiển thị cố định bằng Tên đầy đủ của hệ thống
-            // =========================================================================
             div.setAttribute('data-desc', item.name); 
 
             div.innerHTML = `<div class="icon-box ${bgClass}">${iconContent}</div><span class="icon-text">${item.name}</span>`;
-            div.onclick = function() { navigateTo(item.url, true); }; 
+            
+            // THUẬT TOÁN KIỂM TRA QUYỀN KHI NHẤP VÀO ICON VÀ GỌI UI CẢNH BÁO
+            div.onclick = function() { 
+                // 1. Nếu là Admin toàn quyền (xx) thì cho phép mở tất cả
+                if (sysRoles.includes('xx')) {
+                    navigateTo(item.url, true);
+                    return;
+                }
+                
+                // 2. Nếu không phải Admin, đối chiếu với danh sách quyền đã tải về
+                const allowedIcons = sysIconRoles ? sysIconRoles.split('|') : [];
+                if (allowedIcons.includes(item.name.trim())) {
+                    navigateTo(item.url, true);
+                } else {
+                    // 3. Chặn và gọi Cửa sổ UI Cảnh báo thay vì dùng alert()
+                    const warnMsg = "Tài khoản của Thầy/Cô chưa được cấp quyền mở Hồ sơ <b>[" + item.name + "]</b>.<br>👉 Vui lòng liên hệ Quản trị viên để được cấp quyền!";
+                    showAlertModal(warnMsg);
+                }
+            }; 
+
             desktopArea.appendChild(div);
         });
         
